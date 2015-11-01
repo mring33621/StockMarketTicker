@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mattring.stockmarketticker;
+package com.mattring.stockmarketticker.fake;
 
-import com.mattring.stockmarketticker.fake.FakeTicker;
+import com.mattring.stockmarketticker.EodPoint;
 import java.util.Random;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -24,24 +24,23 @@ import static org.junit.Assert.*;
  * Currently just an eyeball test on stdout.
  * @author Matthew Ring
  */
-public class FakeTickerTest {
+public class FakeTickStreamerTest {
     
-    public FakeTickerTest() {
+    public FakeTickStreamerTest() {
     }
 
     /**
-     * Test of generate method, of class FakeTicker.
+     * Test of generate method, of class FakeTickStreamer.
      */
     @Test
     public void testGenerate() {
-        FakeTicker fakeTicker = new FakeTicker(new Random());
+        FakeTickStreamer fakeTicker = new FakeTickStreamer(new Random());
         fakeTicker
                 .generate(new EodPoint("ABCD", "FASDAQ", 20150101, 10d, 12d, 8d, 11d, 10000d), 100)
-                .stream()
                 .forEachOrdered(t -> System.out.println(t));
+        System.out.println();
         fakeTicker
                 .generate(new EodPoint("EFGH", "MATS", 20150101, 10d, 12d, 8d, 9d, 10000d), 100)
-                .stream()
                 .forEachOrdered(t -> System.out.println(t));
         assertTrue(true);
     }
