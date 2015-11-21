@@ -24,9 +24,9 @@ public class Tick {
     public final long sequenceNum;
     public final String symbol, exchange;
     public final int date;
-    public final Double bid, ask, last;
+    public final double bid, ask, last;
 
-    public Tick(long sequenceNum, String symbol, String exchange, int date, Double bid, Double ask, Double last) {
+    public Tick(long sequenceNum, String symbol, String exchange, int date, double bid, double ask, double last) {
         this.sequenceNum = sequenceNum;
         this.symbol = symbol;
         this.exchange = exchange;
@@ -36,7 +36,7 @@ public class Tick {
         this.last = last;
     }
 
-    public Tick(String symbol, String exchange, int date, Double bid, Double ask, Double last) {
+    public Tick(String symbol, String exchange, int date, double bid, double ask, double last) {
         this(SimpleSequence.next(), symbol, exchange, date, bid, ask, last);
     }
 

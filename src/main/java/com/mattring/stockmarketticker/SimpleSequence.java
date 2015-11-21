@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Matthew.
+ * Copyright 2015 Matthew Ring.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
- * @author Matthew
+ * @author Matthew Ring
  */
 public class SimpleSequence {
 

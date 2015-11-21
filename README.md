@@ -1,6 +1,6 @@
 # StockMarketTicker
 
-Version 0.2.0
+Version 0.2.1
 
 ABOUT:
 * Generates a finite stream of 'plausable' intraday ticks, based on a given EOD OHLCV data point.

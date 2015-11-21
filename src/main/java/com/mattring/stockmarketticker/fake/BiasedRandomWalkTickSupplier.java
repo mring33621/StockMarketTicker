@@ -26,6 +26,8 @@ import java.util.function.Supplier;
  */
 public class BiasedRandomWalkTickSupplier implements Supplier<Tick> {
 
+    private static final double MAX_PCT_CHANGE_PER_TICK = 0.02d; // TODO: make maxPct configurable
+
     private final EodPoint eodPoint;
     private final int numTicks;
     private final Random rng;
@@ -54,64 +56,77 @@ public class BiasedRandomWalkTickSupplier implements Supplier<Tick> {
         bias = 0.50d; // TODO: configurable bias settings
     }
 
+    private double pickBiasedMovementBasedOnPrevTick() {
+
+        double currVal;
+        // return a random-ish walk tick,
+        // with a bias toward the previous direction,
+        // or a bias toward the closing value, if later in the trading day
+        final double pctChange = rng.nextDouble() * MAX_PCT_CHANGE_PER_TICK;
+        //
+        // initial directional bias
+        //
+        if (rng.nextDouble() > bias) {
+            // upward movement
+            currVal = Math.min((prevTick.last * (1d + pctChange)), eodPoint.high);
+            bias = 0.45d; // modestly biased toward another increase
+        } else {
+            // downward movement
+            currVal = Math.max((prevTick.last * (1d - pctChange)), eodPoint.low);
+            bias = 0.55d; // modestly biased toward another decrease
+        }
+        //
+        // adj bias if nearing EOD
+        //
+        if (tickIdx > idxForFinal4thOfDay) {
+            // start pushing hard toward closing value
+            if (currVal < eodPoint.close) {
+                bias = 0.15;
+            } else {
+                bias = 0.85;
+            }
+        } else if (tickIdx > idxForFinal3rdOfDay) {
+            // start pushing moderately toward closing value
+            if (currVal < eodPoint.close) {
+                bias = 0.25;
+            } else {
+                bias = 0.75;
+            }
+        } else if (tickIdx > idxFor2ndHalfOfDay) {
+            // start pushing softly toward closing value
+            if (currVal < eodPoint.close) {
+                bias = 0.35d;
+            } else {
+                bias = 0.65d;
+            }
+        }
+        return currVal;
+    }
+
+    private double[] pickBidAskBasedOnLast(double last) {
+        double pctChange = rng.nextDouble() * MAX_PCT_CHANGE_PER_TICK;
+        final double bid = last * (1d - pctChange);
+        pctChange = rng.nextDouble() * MAX_PCT_CHANGE_PER_TICK;
+        final double ask = last * (1d + pctChange);
+        return new double[] {bid, ask};
+    }
+
     @Override
     public Tick get() {
 
         Tick currTick;
-        double currVal;
 
         if (tickIdx == 1) {
 
             // open
-            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, null, null, eodPoint.open);
+            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, eodPoint.open - 0.01d, eodPoint.open + 0.01d, eodPoint.open);
 
         } else if (tickIdx < numTicks) {
 
-            // return a random-ish walk tick, 
-            // with a bias toward the previous direction,
-            // or a bias toward the closing value, if later in the trading day
-            final double pctChange = rng.nextDouble() * 0.02d; // TODO: make maxPct configurable
+            double currTradeVal = pickBiasedMovementBasedOnPrevTick();
+            double[] nextBidAsk = pickBidAskBasedOnLast(currTradeVal);
 
-            //
-            // initial directional bias
-            //
-            if (rng.nextDouble() > bias) {
-                // upward movement
-                currVal = Math.min((prevTick.last * (1d + pctChange)), eodPoint.high);
-                bias = 0.45d; // modestly biased toward another increase
-            } else {
-                // downward movement
-                currVal = Math.max((prevTick.last * (1d - pctChange)), eodPoint.low);
-                bias = 0.55d; // modestly biased toward another decrease
-            }
-
-            //
-            // adj bias if nearing EOD
-            //
-            if (tickIdx > idxForFinal4thOfDay) {
-                // start pushing hard toward closing value
-                if (currVal < eodPoint.close) {
-                    bias = 0.15;
-                } else {
-                    bias = 0.85;
-                }
-            } else if (tickIdx > idxForFinal3rdOfDay) {
-                // start pushing moderately toward closing value
-                if (currVal < eodPoint.close) {
-                    bias = 0.25;
-                } else {
-                    bias = 0.75;
-                }
-            } else if (tickIdx > idxFor2ndHalfOfDay) {
-                // start pushing softly toward closing value
-                if (currVal < eodPoint.close) {
-                    bias = 0.35d;
-                } else {
-                    bias = 0.65d;
-                }
-            }
-
-            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, null, null, currVal);
+            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, nextBidAsk[0], nextBidAsk[1], currTradeVal);
 
         } else if (tickIdx > numTicks) {
 
@@ -121,7 +136,7 @@ public class BiasedRandomWalkTickSupplier implements Supplier<Tick> {
         } else {
 
             // tickIdx == numTicks; return the closing value
-            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, null, null, eodPoint.close);
+            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, eodPoint.close  - 0.01d, eodPoint.close + 0.01d, eodPoint.close);
 
         }
 
