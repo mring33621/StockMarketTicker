@@ -26,11 +26,12 @@ import java.util.function.Supplier;
  */
 public class BiasedRandomWalkTickSupplier implements Supplier<Tick> {
 
-    private static final double MAX_PCT_CHANGE_PER_TICK = 0.02d; // TODO: make maxPct configurable
+    private static final double MAX_PCT_CHANGE_PER_TICK = 0.00987d; // TODO: make maxPct configurable
 
     private final EodPoint eodPoint;
     private final int numTicks;
     private final Random rng;
+    private final String[] exchanges;
 
     private final int idxFor2ndHalfOfDay;
     private final int idxForFinal3rdOfDay;
@@ -40,11 +41,12 @@ public class BiasedRandomWalkTickSupplier implements Supplier<Tick> {
     private Tick prevTick;
     private double bias;
 
-    public BiasedRandomWalkTickSupplier(EodPoint eodPoint, int numTicks, Random rng) {
+    public BiasedRandomWalkTickSupplier(EodPoint eodPoint, int numTicks, Random rng, String... exchanges) {
 
         this.eodPoint = eodPoint;
         this.numTicks = numTicks;
         this.rng = rng;
+        this.exchanges = exchanges;
 
         // TODO: configurable time thresholds
         idxFor2ndHalfOfDay = (int) (numTicks * 0.50f);
@@ -108,7 +110,7 @@ public class BiasedRandomWalkTickSupplier implements Supplier<Tick> {
         final double bid = last * (1d - pctChange);
         pctChange = rng.nextDouble() * MAX_PCT_CHANGE_PER_TICK;
         final double ask = last * (1d + pctChange);
-        return new double[] {bid, ask};
+        return new double[]{bid, ask};
     }
 
     @Override
@@ -116,32 +118,40 @@ public class BiasedRandomWalkTickSupplier implements Supplier<Tick> {
 
         Tick currTick;
 
-        if (tickIdx == 1) {
+        if (tickIdx <= numTicks) {
+            
+            final String exchange = exchanges[rng.nextInt(exchanges.length)];
 
-            // open
-            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, eodPoint.open - 0.01d, eodPoint.open + 0.01d, eodPoint.open);
+            if (tickIdx == 1) {
 
-        } else if (tickIdx < numTicks) {
+                // open
+                currTick = new Tick(eodPoint.symbol, exchange, eodPoint.date, eodPoint.open - 0.01d, eodPoint.open + 0.01d, eodPoint.open);
 
-            double currTradeVal = pickBiasedMovementBasedOnPrevTick();
-            double[] nextBidAsk = pickBidAskBasedOnLast(currTradeVal);
+            } else if (tickIdx < numTicks) {
 
-            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, nextBidAsk[0], nextBidAsk[1], currTradeVal);
+                double currTradeVal = pickBiasedMovementBasedOnPrevTick();
+                double[] nextBidAsk = pickBidAskBasedOnLast(currTradeVal);
 
-        } else if (tickIdx > numTicks) {
+                currTick = new Tick(eodPoint.symbol, exchange, eodPoint.date, nextBidAsk[0], nextBidAsk[1], currTradeVal);
 
-            // no more ticks needed; return null
-            currTick = null;
+            } else {
+
+                // tickIdx == numTicks; return the closing value
+                currTick = new Tick(eodPoint.symbol, exchange, eodPoint.date, eodPoint.close - 0.01d, eodPoint.close + 0.01d, eodPoint.close);
+
+            }
+
+            prevTick = currTick;
+            tickIdx++;
 
         } else {
-
-            // tickIdx == numTicks; return the closing value
-            currTick = new Tick(eodPoint.symbol, eodPoint.exchange, eodPoint.date, eodPoint.close  - 0.01d, eodPoint.close + 0.01d, eodPoint.close);
-
+            
+            // tickIdx > numTicks; no more ticks wanted
+            
+            currTick = null;
+            prevTick = null;
+            
         }
-
-        prevTick = currTick;
-        tickIdx++;
 
         return currTick;
     }

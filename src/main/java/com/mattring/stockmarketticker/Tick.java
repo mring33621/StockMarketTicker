@@ -21,13 +21,14 @@ package com.mattring.stockmarketticker;
  */
 public class Tick {
 
-    public final long sequenceNum;
+    public final long sequenceNum, timestamp;
     public final String symbol, exchange;
     public final int date;
     public final double bid, ask, last;
 
-    public Tick(long sequenceNum, String symbol, String exchange, int date, double bid, double ask, double last) {
+    public Tick(long sequenceNum, long timestamp, String symbol, String exchange, int date, double bid, double ask, double last) {
         this.sequenceNum = sequenceNum;
+        this.timestamp = timestamp;
         this.symbol = symbol;
         this.exchange = exchange;
         this.date = date;
@@ -35,14 +36,14 @@ public class Tick {
         this.ask = ask;
         this.last = last;
     }
-
+    
     public Tick(String symbol, String exchange, int date, double bid, double ask, double last) {
-        this(SimpleSequence.next(), symbol, exchange, date, bid, ask, last);
+        this(SimpleSequence.next(), System.currentTimeMillis(), symbol, exchange, date, bid, ask, last);
     }
 
     @Override
     public String toString() {
-        return "Tick{" + "sequenceNum=" + sequenceNum + ", symbol=" + symbol + ", exchange=" + exchange + ", date=" + date + ", bid=" + bid + ", ask=" + ask + ", last=" + last + '}';
+        return "Tick{" + "sequenceNum=" + sequenceNum + ", timestamp=" + timestamp + ", symbol=" + symbol + ", exchange=" + exchange + ", date=" + date + ", bid=" + bid + ", ask=" + ask + ", last=" + last + '}';
     }
 
 }

@@ -33,8 +33,8 @@ public class FakeTickStreamer {
         this.rng = rng;
     }
 
-    public Stream<Tick> generate(EodPoint point, int numTicks) {
-        final Supplier<Tick> supplier = new BiasedRandomWalkTickSupplier(point, numTicks, rng);
+    public Stream<Tick> generate(EodPoint point, int numTicks, String... exchanges) {
+        final Supplier<Tick> supplier = new BiasedRandomWalkTickSupplier(point, numTicks, rng, exchanges);
         final Stream<Tick> stream = Stream.generate(supplier).limit(numTicks);
         return stream;
     }

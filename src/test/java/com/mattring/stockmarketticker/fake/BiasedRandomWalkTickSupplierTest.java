@@ -39,24 +39,30 @@ public class BiasedRandomWalkTickSupplierTest {
         BiasedRandomWalkTickSupplier supplier;
         
         int numTicks = 100;
-        EodPoint point = new EodPoint("ABCD", "FASDAQ", 20150101, 10d, 12d, 8d, 11d, 10000d);
+        EodPoint point = new EodPoint("ABCD", 20150101, 10d, 12d, 8d, 11d, 10000d);
         supplier = 
                 new BiasedRandomWalkTickSupplier(
                         point, 
                         numTicks, 
-                        rng);
+                        rng,
+                        "FASDAQ",
+                        "MATS",
+                        "FASDAQ");
         for (int i = 0; i < numTicks + 3; i++) {
             System.out.println(supplier.get());
         }
         
         System.out.println();
         
-        point = new EodPoint("EFGH", "MATS", 20150101, 10d, 12d, 8d, 9d, 10000d);
+        point = new EodPoint("EFGH", 20150101, 10d, 12d, 8d, 9d, 10000d);
         supplier = 
                 new BiasedRandomWalkTickSupplier(
                         point, 
                         numTicks, 
-                        rng);
+                        rng,
+                        "MATS",
+                        "FASDAQ",
+                        "MATS");
         for (int i = 0; i < numTicks + 3; i++) {
             System.out.println(supplier.get());
         }

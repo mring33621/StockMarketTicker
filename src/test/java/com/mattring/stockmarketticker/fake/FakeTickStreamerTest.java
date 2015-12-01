@@ -36,11 +36,11 @@ public class FakeTickStreamerTest {
     public void testGenerate() {
         FakeTickStreamer fakeTicker = new FakeTickStreamer(new Random());
         fakeTicker
-                .generate(new EodPoint("ABCD", "FASDAQ", 20150101, 10d, 12d, 8d, 11d, 10000d), 100)
+                .generate(new EodPoint("ABCD", 20150101, 10d, 12d, 8d, 11d, 10000d), 100, "FASDAQ", "MATS", "FASDAQ")
                 .forEachOrdered(t -> System.out.println(t));
         System.out.println();
         fakeTicker
-                .generate(new EodPoint("EFGH", "MATS", 20150101, 10d, 12d, 8d, 9d, 10000d), 100)
+                .generate(new EodPoint("EFGH", 20150101, 10d, 12d, 8d, 9d, 10000d), 100, "MATS", "FASDAQ", "MATS")
                 .forEachOrdered(t -> System.out.println(t));
         assertTrue(true);
     }

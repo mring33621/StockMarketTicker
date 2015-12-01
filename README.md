@@ -1,6 +1,6 @@
 # StockMarketTicker
 
-Version 0.2.1
+Version 0.3.0
 
 ABOUT:
 * Generates a finite stream of 'plausable' intraday ticks, based on a given EOD OHLCV data point.
@@ -13,7 +13,7 @@ USAGE:
 ```Java
 FakeTickStreamer fakeTicker = new FakeTickStreamer(new Random());
 fakeTicker
-        .generate(new EodPoint("ABCD", "FASDAQ", 20150101, 10d, 12d, 8d, 11d, 10000d), 100)
+        .generate(new EodPoint("ABCD", 20150101, 10d, 12d, 8d, 11d, 10000d), 100, "FASDAQ", "MATS")
         .forEachOrdered(t -> System.out.println(t));
 ```
 

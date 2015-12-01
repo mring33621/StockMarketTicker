@@ -21,13 +21,12 @@ package com.mattring.stockmarketticker;
  */
 public class EodPoint {
     
-    public final String symbol, exchange;
+    public final String symbol;
     public final int date;
     public final double open, high, low, close, volume;
 
-    public EodPoint(String symbol, String exchange, int date, double open, double high, double low, double close, double volume) {
+    public EodPoint(String symbol, int date, double open, double high, double low, double close, double volume) {
         this.symbol = symbol;
-        this.exchange = exchange;
         this.date = date;
         this.open = open;
         this.high = high;
@@ -38,7 +37,7 @@ public class EodPoint {
 
     @Override
     public String toString() {
-        return "EodPoint{" + "symbol=" + symbol + ", exchange=" + exchange + ", date=" + date + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + '}';
+        return "EodPoint{" + "symbol=" + symbol + ", date=" + date + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + '}';
     }
     
     
