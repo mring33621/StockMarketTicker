@@ -40,10 +40,10 @@ public class Tick {
     public Tick(String symbol, String exchange, int date, double bid, double ask, double last) {
         this(SimpleSequence.next(), System.currentTimeMillis(), symbol, exchange, date, bid, ask, last);
     }
-
+    
     @Override
     public String toString() {
         return "Tick{" + "sequenceNum=" + sequenceNum + ", timestamp=" + timestamp + ", symbol=" + symbol + ", exchange=" + exchange + ", date=" + date + ", bid=" + bid + ", ask=" + ask + ", last=" + last + '}';
     }
-
+    
 }
